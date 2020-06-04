@@ -7,6 +7,7 @@ use App\Form\PropertyType;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -67,21 +68,49 @@ class AdminPropertyController extends abstractController
 
 
         /**
-         * @route("/admin/property/{id}", name="admin.property.edit")
+         * @route("/admin/property/{id}", name="admin.property.edit", methods="GET|POST")
          */
         public function edit(Property $property, Request $request)
         {
-            $form = $this->createForm(PropertyType::class, $property);
-            $form->handleRequest($request);
+            if($this->isCsrfTokenValid('delete' . $property->getId(), $request->get('_token') )){
+                $form = $this->createForm(PropertyType::class, $property);
+                $form->handleRequest($request);
 
-            if ($form->isSubmitted() && $form->isValid()) {
-                $this->em->flush();
-                return $this->redirectToRoute('admin.property.index');
+                if ($form->isSubmitted() && $form->isValid()) {
+                    $this->em->flush();
+                    return $this->redirectToRoute('admin.property.index');
+                }
             }
+
 
             return $this->render('admin/edit.html.twig',[
                 'property'=> $property,
                 'form'=> $form->createView()
             ]);
+        }
+
+
+    /**
+     * @route("/admin/property/{id}/delete", name="admin.property.delete", methods={"GET"})
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+        public function delete($id)
+        {
+            // je recupère mon entité
+            $property= $this->getDoctrine()->getRepository(Property::class)->find($id);
+
+
+            // je demande le manager
+            $em = $this->getDoctrine()->getManager();
+            // je dit au manager que cette entité devra faire l'objet d'une suppression
+            $em->remove($property);
+            // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
+            $em->flush();
+            $propertyTitle = $property->getTitle();
+            $this->addFlash('info', "$propertyTitle a été supprimé");
+            // On retourne sur la liste des films
+            return $this->redirectToRoute('admin.property.index');
+
         }
 }

@@ -56,6 +56,8 @@ class AdminPropertyController extends abstractController
             if ($form->isSubmitted() && $form->isValid()) {
                 $this->em->persist($property);
                 $this->em->flush();
+                $this->addFlash('success','Vôtre bien à bien été crée ');
+
                 return $this->redirectToRoute('admin.property.index');
             }
             return $this->render('admin/new.html.twig',[
@@ -72,16 +74,15 @@ class AdminPropertyController extends abstractController
          */
         public function edit(Property $property, Request $request)
         {
-            if($this->isCsrfTokenValid('delete' . $property->getId(), $request->get('_token') )){
-                $form = $this->createForm(PropertyType::class, $property);
-                $form->handleRequest($request);
 
-                if ($form->isSubmitted() && $form->isValid()) {
-                    $this->em->flush();
-                    return $this->redirectToRoute('admin.property.index');
-                }
+            $form = $this->createForm(PropertyType::class, $property);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $this->em->flush();
+                $this->addFlash('success','Vôtre bien à bien été modifié ');
+                return $this->redirectToRoute('admin.property.index');
             }
-
 
             return $this->render('admin/edit.html.twig',[
                 'property'=> $property,
@@ -95,22 +96,25 @@ class AdminPropertyController extends abstractController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-        public function delete($id)
+        public function delete($id, Request $request)
         {
             // je recupère mon entité
             $property= $this->getDoctrine()->getRepository(Property::class)->find($id);
 
+            if($this->isCsrfTokenValid('delete' . $property->getId(), $request->get('_token') )){
+                $em = $this->getDoctrine()->getManager();
+                // je dit au manager que cette entité devra faire l'objet d'une suppression
+                $em->remove($property);
+                // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
+                $em->flush();
+                $propertyTitle = $property->getTitle();
+                $this->addFlash('info', "Vôtre bien à été supprimé");
 
-            // je demande le manager
-            $em = $this->getDoctrine()->getManager();
-            // je dit au manager que cette entité devra faire l'objet d'une suppression
-            $em->remove($property);
-            // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
-            $em->flush();
-            $propertyTitle = $property->getTitle();
-            $this->addFlash('info', "$propertyTitle a été supprimé");
-            // On retourne sur la liste des films
+            }
+
             return $this->redirectToRoute('admin.property.index');
+
+
 
         }
 }

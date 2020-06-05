@@ -63,6 +63,7 @@ class Property
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\Range(min=10000, max=1500000)
      */
     private $price;
 

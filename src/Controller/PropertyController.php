@@ -1,8 +1,10 @@
 <?php
 namespace App\Controller;
 
+use App\Entity\Contacte;
 use App\Entity\Property;
 use App\Entity\PropertySearch;
+use App\Form\ContacteType;
 use App\Form\PropertySearchType;
 use App\Repository\PropertyRepository;
 
@@ -62,6 +64,9 @@ public function index(PaginatorInterface $paginator, Request $request): response
      */
 public function show(Property $property, string $slug): Response
 {
+    $contacte = new Contacte();
+    $form = $this->createForm(ContacteType::class, $contacte);
+    $contacte->setProperty($property);
     if($property->getSlug() !== $slug){
         return $this->redirectToRoute('property.show', [
             'id'=> $property->getId(),
@@ -70,7 +75,8 @@ public function show(Property $property, string $slug): Response
     }
     return $this->render('property/show.html.twig',[
         'property'=> $property,
-    'current_menu'=>'properties'
+        'current_menu'=>'properties',
+        'form'=> $form->createView()
 ]);
 }
 

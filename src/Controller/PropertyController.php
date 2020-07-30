@@ -1,8 +1,11 @@
 <?php
 namespace App\Controller;
 
+use App\Entity\Contacte;
 use App\Entity\Property;
 use App\Entity\PropertySearch;
+use App\Form\ContacteType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Form\PropertySearchType;
 use App\Repository\PropertyRepository;
 
@@ -60,19 +63,23 @@ public function index(PaginatorInterface $paginator, Request $request): response
      * @param Property $property
      * @return Response
      */
-public function show(Property $property, string $slug): Response
-{
-    if($property->getSlug() !== $slug){
-        return $this->redirectToRoute('property.show', [
-            'id'=> $property->getId(),
-            'slug'=> $property->getSlug()
-        ], 301);
+    public function show(Property $property, string $slug): Response
+    {
+        $contacte = new Contacte();
+        $contacte->setProperty($property);
+        $form = $this->createForm(ContacteType::class, $contacte);
+        if($property->getSlug() !== $slug){
+            return $this->redirectToRoute('property.show', [
+                'id'=> $property->getId(),
+                'slug'=> $property->getSlug()
+            ], 301);
+        }
+        return $this->render('property/show.html.twig',[
+            'property'=> $property,
+            'current_menu'=>'properties',
+            'form'=> $form->createView()
+        ]);
     }
-    return $this->render('property/show.html.twig',[
-        'property'=> $property,
-    'current_menu'=>'properties'
-]);
-}
 
 
 }

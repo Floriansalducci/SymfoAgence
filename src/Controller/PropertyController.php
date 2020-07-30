@@ -5,6 +5,7 @@ use App\Entity\Contacte;
 use App\Entity\Property;
 use App\Entity\PropertySearch;
 use App\Form\ContacteType;
+use App\Notification\ContacteNotification;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Form\PropertySearchType;
 use App\Repository\PropertyRepository;
@@ -63,17 +64,32 @@ public function index(PaginatorInterface $paginator, Request $request): response
      * @param Property $property
      * @return Response
      */
-    public function show(Property $property, string $slug): Response
+    public function show(Property $property, string $slug, Request $request, ContacteNotification $notification): Response
     {
-        $contacte = new Contacte();
-        $contacte->setProperty($property);
-        $form = $this->createForm(ContacteType::class, $contacte);
+
         if($property->getSlug() !== $slug){
             return $this->redirectToRoute('property.show', [
                 'id'=> $property->getId(),
                 'slug'=> $property->getSlug()
             ], 301);
         }
+
+        $contacte = new Contacte();
+        $contacte->setProperty($property);
+        $form = $this->createForm(ContacteType::class, $contacte);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $notification->notify($contacte);
+            $this->addFlash('success','Votre email à bien été envoyé');
+            /*
+            return $this->redirectToRoute('property.show', [
+                'id'=> $property->getId(),
+                'slug'=> $property->getSlug()
+            ]);
+            */
+        }
+
         return $this->render('property/show.html.twig',[
             'property'=> $property,
             'current_menu'=>'properties',

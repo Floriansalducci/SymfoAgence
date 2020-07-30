@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
-use Symfony\Component\Validator\Constraint as Assert;
+
+use Symfony\Component\Validator\Constraints as Assert;
 
 class Contacte {
 
     /**
      * @var string|null
-     * @Assert\NotBlank()
+     * @Assert\NotBlank()Ò
      * @Assert\Length(min=2, max=100)
      */
     private $firstname;
@@ -40,7 +41,7 @@ class Contacte {
      * @Assert\NotBlank()
      * @Assert\Length(min=10)
      */
-    private $messsage;
+    private $message;
 
     /**
      * @var Property
@@ -141,20 +142,22 @@ class Contacte {
     /**
      * @return string|null
      */
-    public function getMesssage(): ?string
+    public function getMessage(): ?string
     {
-        return $this->messsage;
+        return $this->message;
     }
 
     /**
-     * @param string|null $messsage
+     * @param string|null $message
      * @return Contacte
      */
-    public function setMesssage(?string $messsage): Contacte
+    public function setMessage(?string $message): Contacte
     {
-        $this->messsage = $messsage;
+        $this->message = $message;
         return $this;
     }
+
+
 
 
 }

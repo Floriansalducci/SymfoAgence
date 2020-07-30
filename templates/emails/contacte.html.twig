@@ -1,0 +1,35 @@
+
+{% block body %}
+        <div class="row">
+            <div class="col-md-8">
+                <h2>Demande d'information</h2>
+                <table class="table table-striped">
+                    <tr>
+                        <td>Prénom</td>
+                        <td>{{ contacte.firstname }}</td>
+                    </tr>
+                    <tr>
+                        <td>Nom</td>
+                        <td>{{ contacte.lastname }}</td>
+                    </tr>
+                    <tr>
+                        <td>Téléphone</td>
+                        <td>{{ contacte.Phone }}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>{{ contacte.email }}</td>
+                    </tr>
+                    <tr>
+                        <td>Message</td>
+                        <td>{{ contacte.message }}</td>
+                    </tr>
+
+                </table>
+            </div>
+
+        </div>
+{% endblock %}
+
+
+

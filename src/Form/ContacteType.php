@@ -25,7 +25,7 @@ class ContacteType extends AbstractType
             ->add('phone',TextType::class, ['label' => 'Téléphone'])
             ->add('email',TextType::class, ['label' => 'Adresse mail'])
             ->add('message',TextareaType::class, ['label' => 'Vôtre message'])
-            ->add('firstname',TextType::class, ['label' => 'Create Task'])
+
         ;
     }
 
